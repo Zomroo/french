@@ -46,9 +46,9 @@ def handle_message(client: Client, message: Message):
 
 
     
-@app.on_message(filters.command("alive", prefixes="/") & filters.group)
-def alive_command_handler(client, message):
-    message.reply("I am alive!")    
+@app.on_message(filters.group & filters.command("hello", prefixes="/"))
+def hello(client, message):
+    client.send_message(message.chat.id, "Hello from the bot!")  
     
     
 # Define message handler
