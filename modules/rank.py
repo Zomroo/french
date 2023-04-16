@@ -37,7 +37,7 @@ def handle_message(client: Client, message: Message):
 
         
 # Define command handler
-@app.on_message(filters.command("me") & (filters.chat))
+@app.on_message(filters.command("me") & filters.chat)
 def handle_me_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
