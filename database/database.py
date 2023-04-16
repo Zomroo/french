@@ -1,6 +1,7 @@
 import config
 from pymongo import MongoClient
 
+
 class Database:
     def __init__(self, uri: str, db_name: str):
         self.client = MongoClient(uri)
@@ -14,6 +15,9 @@ class Database:
         except ConnectionError as e:
             print(f"Failed to connect to database: {e}")
 
+    def add_user(self, chat_id: int, user_id: int):
+        self.collection.insert_one({"chat_id": chat_id, "user_id": user_id})
+
     def get_user(self, chat_id: int, user_id: int):
         return self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
 
@@ -22,8 +26,4 @@ class Database:
             {"chat_id": chat_id, "user_id": user_id},
             {"$set": {"chat_id": chat_id, "user_id": user_id, "level": level, "points": points}},
             upsert=True
-            
-   def add_user(self, chat_id: int, user_id: int):
-    self.collection.insert_one({"chat_id": chat_id, "user_id": user_id, "level": 0, "points": 0})
-         
         )
