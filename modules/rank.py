@@ -34,15 +34,17 @@ def handle_message(client: Client, message: Message):
     # Check if user has enough points to be promoted to next rank
     level = get_level(points)
     if level > user_data.get("level", 0):
-    rank_name = get_rank_name(level)
-    promotion_message = f"Congratulations, @{message.from_user.username} ({message.from_user.first_name}), you have been promoted to {rank_name}!"
-    client.send_message(chat_id, promotion_message)
-    user_chat_id = user_id if message.chat.type == "private" else chat_id
-    client.send_message(user_chat_id, promotion_message) # sends promotion message to user in group or private chat
-    db.update_user(chat_id, user_id, level, points) # update user's points in the database
-else:
-    rank_name = get_rank_name(user_data.get("level", 0))
-    db.update_user(chat_id, user_id, user_data.get("level", 0), points) # update user's points in the database
+        rank_name = get_rank_name(level)
+        promotion_message = f"Congratulations, {message.from_user.mention}! You have been promoted to {rank_name}!"
+        client.send_message(chat_id, promotion_message)
+        user_chat_id = user_id if message.chat.type == "private" else chat_id
+        client.send_message(user_chat_id, promotion_message) # sends promotion message to user in group or private chat
+        db.update_user(chat_id, user_id, level, points) # update user's points in the database
+    else:
+        db.update_user(chat_id, user_id, level, points) # update user's points in the database
+
+    # Update user's points in the database
+    db.update_user(chat_id, user_id, level, points)
 
 
 # Define command handler
