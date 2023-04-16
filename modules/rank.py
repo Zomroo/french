@@ -36,9 +36,8 @@ def handle_message(client: Client, message: Message):
         client.send_message(chat_id, f"Congratulations, you have been promoted to {rank_name}!")
 
         
-# Define command handler
-@app.on_message(filters.command("me", prefixes="!", pass_args=True))
-def handle_me_command(client: Client, message: Message, args: list):
+@app.on_message(filters.command("me", prefixes="!"))
+def handle_me_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     user_data = db.get_user(chat_id, user_id)
