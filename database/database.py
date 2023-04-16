@@ -19,7 +19,9 @@ class Database:
         self.collection.insert_one({"chat_id": chat_id, "user_id": user_id})
 
     def get_user(self, chat_id: int, user_id: int):
-        return self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
+    user = self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
+    return user or {"chat_id": chat_id, "user_id": user_id, "level": 0, "points": 0}
+
 
     def update_user(self, chat_id: int, user_id: int, level: int, points: int):
         self.collection.update_one(
