@@ -1,11 +1,10 @@
-from pyrogram import Client , filters
-from pymongo import MongoClient
-import os
+import config
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from database.database import Database
 
-API_ID = os.environ.get("API_ID")
-API_HASH = os.environ.get("API_HASH")
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-MONGO_URL = os.environ.get("MONGO_URL")
+db = Database(config.MONGO_URI, config.MONGO_DB_NAME)
+app = Client("my_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
 
 
