@@ -46,27 +46,31 @@ def handle_message(client: Client, message: Message):
 
 
     
-@app.on_message(filters.group & ~filters.private & filters.command("hello", prefixes="/"))
-def hello(client, message):
-    client.send_message(message.chat.id, "Hello from the bot!") 
-    
-    
-# Define message handler
-@app.on_message(filters.command("rank") & ~filters.private)
-def handle_message(client: Client, message: Message):
+# Define message handler for /rank command
+@app.on_message(filters.command("rank") & ~filters.private & filters.group)
+def handle_rank_command(client: Client, message: Message):
     chat_id = message.chat.id
-    user_id = message.from_user.id
+    command_parts = message.text.strip().split(" ")
+    if len(command_parts) < 2:
+        client.send_message(chat_id, "Please specify the user ID along with the /rank command.")
+        return
+
+    try:
+        user_id = int(command_parts[1])
+    except ValueError:
+        client.send_message(chat_id, "Invalid user ID.")
+        return
+
     user_data = db.get_user(chat_id, user_id)
-
     if user_data is None:
-        points = 0
-        rank_name = "Rank 1"
-    else:
-        points = user_data.get("points", 0)
-        level = user_data.get("level", 0)
-        rank_name = get_rank_name(level)
+        client.send_message(chat_id, "User not found in the database.")
+        return
 
-    message_text = f"{message.from_user.mention}, your rank is {rank_name} and you have {points} points."
+    points = user_data.get("points", 0)
+    level = user_data.get("level", 0)
+    rank_name = get_rank_name(level)
+
+    message_text = f"The user with ID {user_id} has rank {rank_name} and {points} points in this chat."
     client.send_message(chat_id, message_text)
 
 
