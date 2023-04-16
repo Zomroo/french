@@ -36,7 +36,7 @@ def handle_message(client: Client, message: Message):
         client.send_message(chat_id, f"Congratulations, you have been promoted to {rank_name}!")
 
         
-@app.on_message(filters.command("me", prefixes="!"))
+@app.on_message(filters.command("me", prefixes="!") & filters.group)
 def handle_me_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
@@ -49,7 +49,8 @@ def handle_me_command(client: Client, message: Message):
         level = user_data["level"]
         rank_name = get_rank_name(level)
         points_to_next_rank = get_points_to_next_rank(level, points)
-        client.send_message(chat_id, f"Your current rank is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+        client.send_message(chat_id, f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+
 
 
 
