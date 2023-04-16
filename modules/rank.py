@@ -36,7 +36,7 @@ def handle_message(client: Client, message: Message):
     if level > user_data.get("level", 0):
         db.update_user(chat_id, user_id, level, points)
         rank_name = get_rank_name(level)
-        client.send_message(chat_id, f"Congratulations @{message.from_user.username}, you have been promoted to {rank_name}!")
+        client.send_message(chat_id, f"Congratulations @{message.from_user.mention}, you have been promoted to {rank_name}!")
 
     # Update user's points in the database
     db.update_user(chat_id, user_id, level, points)
