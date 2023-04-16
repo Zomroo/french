@@ -42,23 +42,23 @@ def handle_message(client: Client, message: Message):
     db.update_user(chat_id, user_id, level, points)
 
 
- # Define message handler
-@app.on_message(filters.group & filters.command("me"))
-def handle_me_command(client: Client, message: Message):
+ # Define /me command handler
+@app.on_message(filters.command("me"))
+def me_command_handler(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     user_data = db.get_user(chat_id, user_id)
 
     if user_data is None:
-        db.add_user(chat_id, user_id)
         points = 0
+        rank_name = "Rank 1"
     else:
         points = user_data.get("points", 0)
+        level = user_data.get("level", 0)
+        rank_name = get_rank_name(level)
 
-    rank_name = get_rank_name(user_data.get("level", 0))
-
-    client.send_message(chat_id, f"{message.from_user.mention} - Rank: {rank_name}")
-
+    message_text = f"{message.from_user.mention}, your rank is {rank_name} and you have {points} points."
+    client.send_message(chat_id, message_text)
    
 
 
