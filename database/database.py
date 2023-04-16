@@ -1,6 +1,5 @@
 import config
 from pymongo import MongoClient
-from pymongo.errors import ConnectionError
 
 class Database:
     def __init__(self, uri: str, db_name: str):
