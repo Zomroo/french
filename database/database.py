@@ -1,16 +1,26 @@
-import pymongo
+import config
+from pymongo import MongoClient
+from pymongo.errors import ConnectionError
 
 class Database:
-    def __init__(self, connection_string: str, database_name: str):
-        self.client = pymongo.MongoClient(connection_string)
-        self.db = self.client[database_name]
-        self.users = self.db["users"]
-        
-    def update_user(self, chat_id: int, user_id: int, level: int, points: int):
-        self.users.update_one({"chat_id": chat_id, "user_id": user_id}, {"$set": {"level": level, "points": points}}, upsert=True)
-        
+    def __init__(self, uri: str, db_name: str):
+        self.client = MongoClient(uri)
+        self.db = self.client[db_name]
+        self.collection = self.db[config.COLLECTION_NAME]
+        self.ensure_indexes()
+
+    def ensure_indexes(self):
+        try:
+            self.collection.create_index([("chat_id", 1), ("user_id", 1)], unique=True)
+        except ConnectionError as e:
+            print(f"Failed to connect to database: {e}")
+
     def get_user(self, chat_id: int, user_id: int):
-        return self.users.find_one({"chat_id": chat_id, "user_id": user_id})
-        
-    def get_users_by_level(self, chat_id: int, level: int):
-        return self.users.find({"chat_id": chat_id, "level": level})
+        return self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
+
+    def update_user(self, chat_id: int, user_id: int, level: int, points: int):
+        self.collection.update_one(
+            {"chat_id": chat_id, "user_id": user_id},
+            {"$set": {"chat_id": chat_id, "user_id": user_id, "level": level, "points": points}},
+            upsert=True
+        )
