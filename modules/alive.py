@@ -11,5 +11,4 @@ def alive_command_handler(client, message):
     message.reply("I am alive!")
 
 
-if __name__ == '__main__':
-    app.run()
+
