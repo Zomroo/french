@@ -8,10 +8,10 @@ app = Client("my_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token
 
 RANKS = [
     {"name": "Rank 1", "points": 0},
-    {"name": "Rank 2", "points": 100},
-    {"name": "Rank 3", "points": 200},
-    {"name": "Rank 4", "points": 300},
-    {"name": "Rank 5", "points": 400},
+    {"name": "Rank 2", "points": 10},
+    {"name": "Rank 3", "points": 20},
+    {"name": "Rank 4", "points": 30},
+    {"name": "Rank 5", "points": 40},
     # add more ranks here
 ]
 
