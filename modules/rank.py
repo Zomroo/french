@@ -41,21 +41,25 @@ def handle_message(client: Client, message: Message):
     # Update user's points in the database
     db.update_user(chat_id, user_id, level, points)
 
-# Define command handler
-@app.on_message(filters.command("me") & (filters.group | filters.private))
-def handle_me_command(client: Client, message: Message):
+
+ # Define /me command handler
+@app.on_message(filters.command("me"))
+def me_command_handler(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     user_data = db.get_user(chat_id, user_id)
 
     if user_data is None:
-        client.send_message(chat_id, "You have not earned any points yet.")
+        points = 0
+        rank_name = "Rank 1"
     else:
-        points = user_data["points"]
-        level = user_data["level"]
+        points = user_data.get("points", 0)
+        level = user_data.get("level", 0)
         rank_name = get_rank_name(level)
-        points_to_next_rank = get_points_to_next_rank(level, points)
-        client.send_message(chat_id, f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+
+    message_text = f"{message.from_user.mention}, your rank is {rank_name} and you have {points} points."
+    client.send_message(chat_id, message_text)
+   
 
 
 # Define start command handler
