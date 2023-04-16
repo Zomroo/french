@@ -16,7 +16,7 @@ RANKS = [
 ]
 
 # Define message handler
-@app.on_message(filters.group)
+@app.on_message(filters.group | filters.private)
 def handle_message(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
