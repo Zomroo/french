@@ -53,6 +53,15 @@ def handle_me_command(client: Client, message: Message):
         client.send_message(chat_id, f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
 
 
+# Define start command handler
+@app.on_message(filters.command("start") & filters.private)
+def start(client, message):
+    text = "Hi there! I am your bot. Send me a message in a group chat to start earning points."
+    client.send_message(chat_id=message.chat.id, text=text)
+        
+        
+        
+        
 def get_level(points: int) -> int:
     for i, rank in enumerate(RANKS):
         if points < rank["points"]:
