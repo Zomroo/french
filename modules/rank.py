@@ -37,7 +37,7 @@ def handle_message(client: Client, message: Message):
 
         
 # Define command handler
-@app.on_message(filters.command("me"))
+@app.on_message(filters.command("me", prefixes="!"))
 def handle_me_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
@@ -51,6 +51,7 @@ def handle_me_command(client: Client, message: Message):
         rank_name = get_rank_name(level)
         points_to_next_rank = get_points_to_next_rank(level, points)
         client.send_message(chat_id, f"Your current rank is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+
 
 def get_level(points: int) -> int:
     for i, rank in enumerate(RANKS):
