@@ -22,4 +22,8 @@ class Database:
             {"chat_id": chat_id, "user_id": user_id},
             {"$set": {"chat_id": chat_id, "user_id": user_id, "level": level, "points": points}},
             upsert=True
+            
+   def add_user(self, chat_id: int, user_id: int):
+    self.collection.insert_one({"chat_id": chat_id, "user_id": user_id, "level": 0, "points": 0})
+         
         )
