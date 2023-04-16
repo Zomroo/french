@@ -1,5 +1,6 @@
 from pyrogram import Client
 import config
+from modules import alive
 from modules import rank
 
 
