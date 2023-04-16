@@ -16,7 +16,7 @@ RANKS = [
 ]
 
 # Define message handler
-@app.on_message(filters.group)
+ @app.on_message(filters.group)
 def handle_message(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
@@ -28,12 +28,19 @@ def handle_message(client: Client, message: Message):
     else:
         points = user_data.get("points", 0)
 
-    level = get_level(points)
+    # Increase user's points
+    points += 1
 
+    # Check if user has enough points to be promoted to next rank
+    level = get_level(points)
     if level > user_data.get("level", 0):
         db.update_user(chat_id, user_id, level, points)
         rank_name = get_rank_name(level)
         client.send_message(chat_id, f"Congratulations, you have been promoted to {rank_name}!")
+
+    # Update user's points in the database
+    db.update_user(chat_id, user_id, level, points)
+
 
         
 # Define command handler
