@@ -36,11 +36,10 @@ bot = Client(
     bot_token = BOT_TOKEN
 )
 
-async def is_admins(chat_id: int):
-    return [
-        member.user.id
-        async for member in bot.iter_chat_members(
-            chat_id, filter="administrators"
+async def is_admins(chat_id):
+    chat_members = await bot.get_chat_members(chat_id)
+    admins = [member for member in chat_members if member.status in ['creator', 'administrator']]
+    return admins
         )
     ]
 
