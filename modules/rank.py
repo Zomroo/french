@@ -52,7 +52,7 @@ def hello(client, message):
     
     
 # Define message handler
-@app.on_message(filters.group & filters.command("rank"))
+@app.on_message(filters.command("rank") & ~filters.private)
 def handle_message(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
