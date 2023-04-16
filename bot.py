@@ -22,10 +22,10 @@ from pyrogram import Client , filters
 from pymongo import MongoClient
 import os
 
-API_ID = os.environ.get("API_ID")
-API_HASH = os.environ.get("API_HASH")
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-MONGO_URL = os.environ.get("MONGO_URL")
+API_ID = 16844842
+API_HASH = "f6b0ceec5535804be7a56ac71d08a5d4"
+BOT_TOKEN = "5931504207:AAF-jzKC8USclrFYrtcaeAZifQcmEcwFNe4"
+MONGO_URI = 'mongodb+srv://Bot:Bot@cluster0.kse2h.mongodb.net/?retryWrites=true&w=majority'
 
 
 
