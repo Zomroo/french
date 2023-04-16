@@ -42,9 +42,9 @@ def handle_message(client: Client, message: Message):
     db.update_user(chat_id, user_id, level, points)
 
 
- # Define /me command handler
-@app.on_message(filters.command("me"))
-def me_command_handler(client: Client, message: Message):
+ # Define rank command handler
+@app.on_message(filters.command("rank"))
+def rank_command_handler(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     user_data = db.get_user(chat_id, user_id)
@@ -59,6 +59,7 @@ def me_command_handler(client: Client, message: Message):
 
     message_text = f"{message.from_user.mention}, your rank is {rank_name} and you have {points} points."
     client.send_message(chat_id, message_text)
+
    
 
 
