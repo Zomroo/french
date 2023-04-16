@@ -1,79 +1,136 @@
-import config
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from database.database import Database
+from pyrogram import Client , filters
+from pymongo import MongoClient
+import os
 
-db = Database(config.MONGO_URI, config.MONGO_DB_NAME)
-app = Client("my_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
+API_ID = os.environ.get("API_ID")
+API_HASH = os.environ.get("API_HASH")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+MONGO_URL = os.environ.get("MONGO_URL")
 
-RANKS = [
-    {"name": "Rank 1", "points": 0},
-    {"name": "Rank 2", "points": 10},
-    {"name": "Rank 3", "points": 20},
-    {"name": "Rank 4", "points": 30},
-    {"name": "Rank 5", "points": 40},
-    # add more ranks here
-]
 
-# Define message handler
-@app.on_message(filters.group)
-def handle_message(client: Client, message: Message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    user_data = db.get_user(chat_id, user_id)
 
-    if user_data is None:
-        db.add_user(chat_id, user_id)
-        points = 0
+bot = Client(
+    "Level" ,
+    api_id = API_ID ,
+    api_hash = API_HASH ,
+    bot_token = BOT_TOKEN
+)
+
+async def is_admins(chat_id: int):
+    return [
+        member.user.id
+        async for member in bot.iter_chat_members(
+            chat_id, filter="administrators"
+        )
+    ]
+
+levellink =["https://telegra.ph/file/6620fe683ff3989268c7f.mp4", "https://telegra.ph/file/c6bbce91cb75d4ab318ae.mp4", "https://telegra.ph/file/c2ac7b63d248f49da952c.mp4", "https://telegra.ph/file/b100466a5f0c42fa7255f.mp4", "https://telegra.ph/file/67c9dc7b59f78aa7aaf4c.mp4", "https://telegra.ph/file/06e2d74343e89c9d3cd12.mp4", "https://telegra.ph/file/88458a18eea8e86292b14.mp4", "https://telegra.ph/file/e3786d4f321ff4335a70f.mp4"]
+levelname = ["Team Rocket", "Stray God", "Vector", "Hero Association", "Z Warrior", "Black Knight", "Ghoul", "Overlord"]
+levelnum = [2,5,15,25,35,50,70,100]
+
+
+
+@bot.on_message(
+    filters.command("level", prefixes=["/", ".", "?", "-"])
+    & ~filters.private)
+async def levelsystem(_, message): 
+    leveldb = MongoClient(MONGO_URL)
+   
+    toggle = leveldb["ToggleDb"]["Toggle"] 
+    if message.from_user:
+        user = message.from_user.id
+        chat_id = message.chat.id
+        if user not in (
+            await is_admins(chat_id)
+        ):
+            return await message.reply_text(
+                "You are not admin"
+            )
+    is_level = toggle.find_one({"chat_id": message.chat.id})
+    if not is_level:
+        toggle.insert_one({"chat_id": message.chat.id})
+        await message.reply_text("Level System Enable")
     else:
-        points = user_data.get("points", 0)
-
-    level = get_level(points)
-
-    if level > user_data.get("level", 0):
-        db.update_user(chat_id, user_id, level, points)
-        rank_name = get_rank_name(level)
-        client.send_message(chat_id, f"Congratulations, you have been promoted to {rank_name}!")
-
-        
-# Define command handler
-@app.on_message(filters.command("me") & (filters.group | filters.private))
-def handle_me_command(client: Client, message: Message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    user_data = db.get_user(chat_id, user_id)
-
-    if user_data is None:
-        client.send_message(chat_id, "You have not earned any points yet.")
-    else:
-        points = user_data["points"]
-        level = user_data["level"]
-        rank_name = get_rank_name(level)
-        points_to_next_rank = get_points_to_next_rank(level, points)
-        client.send_message(chat_id, f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+        toggle.delete_one({"chat_id": message.chat.id})
+        await message.reply_text("Level System Disable")
 
 
-# Define start command handler
-@app.on_message(filters.command("start") & filters.private)
-def start(client, message):
-    text = "Hi there! I am your bot. Send me a message in a group chat to start earning points."
-    client.send_message(chat_id=message.chat.id, text=text)
-        
-        
-        
-        
-def get_level(points: int) -> int:
-    for i, rank in enumerate(RANKS):
-        if points < rank["points"]:
-            return i
-    return len(RANKS)
+@bot.on_message(
+    (filters.document
+     | filters.text
+     | filters.photo
+     | filters.sticker
+     | filters.animation
+     | filters.video)
+    & ~filters.private,
+    group=8,
+)
+async def level(client, message):
+    chat = message.chat.id
+    user_id = message.from_user.id    
 
-def get_rank_name(level: int) -> str:
-    return RANKS[level]["name"]
+    leveldb = MongoClient(MONGO_URL)
+    
+    level = leveldb["LevelDb"]["Level"] 
+    toggle = leveldb["ToggleDb"]["Toggle"] 
 
-def get_points_to_next_rank(level: int, points: int) -> int:
-    next_rank_points = RANKS[level + 1]["points"] if level + 1 < len(RANKS) else None
-    if next_rank_points is None:
-        return 0
-    else:
-        return next_rank_points - points
+    is_level = toggle.find_one({"chat_id": message.chat.id})
+    if is_level:
+        xpnum = level.find_one({"level": user_id, "chatid": chat})
+
+        if not message.from_user.is_bot:
+            if xpnum is None:
+                newxp = {"level": user_id, "chatid": chat, "xp": 10}
+                level.insert_one(newxp)   
+                    
+            else:
+                xp = xpnum["xp"] + 10
+                level.update_one({"level": user_id, "chatid": chat}, {
+                    "$set": {"xp": xp}})
+                l = 0
+                while True:
+                    if xp < ((50*(l**2))+(50*(l))):
+                         break
+                    l += 1
+                xp -= ((50*((l-1)**2))+(50*(l-1)))
+                if xp == 0:
+                    await message.reply_text(f"🌟 {message.from_user.mention}, You have reached level {l}**, Nothing can stop you on your way!")
+    
+                    for lv in range(len(levelname)) and range(len(levellink)):
+                            if l == levelnum[lv]:            
+                                Link = f"{levellink[lv]}"
+                                await message.reply_video(video=Link, caption=f"{message.from_user.mention}, You have reached Rank Name **{levelname[lv]}**")
+                  
+
+                               
+@bot.on_message(
+    filters.command("rank", prefixes=["/", ".", "?", "-"])
+    & ~filters.private)
+async def rank(client, message):
+    chat = message.chat.id
+    user_id = message.from_user.id    
+    
+    leveldb = MongoClient(MONGO_URL)
+    
+    level = leveldb["LevelDb"]["Level"] 
+    toggle = leveldb["ToggleDb"]["Toggle"] 
+
+    is_level = toggle.find_one({"chat_id": message.chat.id})
+    if is_level:
+        xpnum = level.find_one({"level": user_id, "chatid": chat})
+        xp = xpnum["xp"]
+        l = 0
+        r = 0
+        while True:
+            if xp < ((50*(l**2))+(50*(l))):
+                break
+            l += 1
+
+        xp -= ((50*((l-1)**2))+(50*(l-1)))
+        rank = level.find().sort("xp", -1)
+        for k in rank:
+            r += 1
+            if xpnum["level"] == k["level"]:
+                break                     
+        await message.reply_text(f"{message.from_user.mention} Level Info:\nLevel: {l}\nProgess: {xp}/{int(200 *((1/2) * l))}\n Ranking: {r}")
+
