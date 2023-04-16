@@ -47,19 +47,19 @@ def handle_message(client: Client, message: Message):
 
     
 # Define message handler for /rank command
-@app.on_message(filters.command("rank") & ~filters.private & filters.group)
+@app.on_message(filters.command("rank") & ~filters.private)
 def handle_rank_command(client: Client, message: Message):
     chat_id = message.chat.id
-    command_parts = message.text.strip().split(" ")
-    if len(command_parts) < 2:
-        client.send_message(chat_id, "Please specify the user ID along with the /rank command.")
-        return
-
-    try:
-        user_id = int(command_parts[1])
-    except ValueError:
-        client.send_message(chat_id, "Invalid user ID.")
-        return
+    user_id = None
+    if len(message.command) < 2:
+        # User ID not provided, get own rank and points
+        user_id = message.from_user.id
+    else:
+        try:
+            user_id = int(message.command[1])
+        except ValueError:
+            client.send_message(chat_id, "Invalid user ID.")
+            return
 
     user_data = db.get_user(chat_id, user_id)
     if user_data is None:
