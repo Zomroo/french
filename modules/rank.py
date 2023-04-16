@@ -7,14 +7,6 @@ db = Database(config.MONGO_URI, config.MONGO_DB_NAME)
 app = Client("my_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
 
-
-bot = Client(
-    "Level" ,
-    api_id = API_ID ,
-    api_hash = API_HASH ,
-    bot_token = BOT_TOKEN
-)
-
 async def is_admins(chat_id: int):
     return [
         member.user.id
