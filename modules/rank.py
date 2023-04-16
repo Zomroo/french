@@ -16,7 +16,7 @@ RANKS = [
 ]
 
 # Define message handler
- @app.on_message(filters.group)
+@app.on_message(filters.group)
 def handle_message(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
@@ -41,8 +41,6 @@ def handle_message(client: Client, message: Message):
     # Update user's points in the database
     db.update_user(chat_id, user_id, level, points)
 
-
-        
 # Define command handler
 @app.on_message(filters.command("me") & (filters.group | filters.private))
 def handle_me_command(client: Client, message: Message):
