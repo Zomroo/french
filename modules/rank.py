@@ -15,6 +15,9 @@ RANKS = [
     # add more ranks here
 ]
 
+
+
+
 # Define message handler
 @app.on_message(filters.group)
 def handle_message(client: Client, message: Message):
@@ -42,6 +45,12 @@ def handle_message(client: Client, message: Message):
     db.update_user(chat_id, user_id, level, points)
 
 
+    
+@app.on_message(filters.command("alive", prefixes="/") & filters.group)
+def alive_command_handler(client, message):
+    message.reply("I am alive!")    
+    
+    
 # Define message handler
 @app.on_message(filters.group & filters.command("rank"))
 def handle_message(client: Client, message: Message):
