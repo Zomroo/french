@@ -47,7 +47,7 @@ def handle_message(client: Client, message: Message):
 
     
 # Define message handler for /rank command
-@app.on_message(filters.command("rank") & ~filters.private)
+@app.on_message(filters.command("rank") & filters.group)
 def handle_rank_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = None
