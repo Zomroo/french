@@ -49,7 +49,10 @@ def handle_me_command(client: Client, message: Message):
         level = user_data["level"]
         rank_name = get_rank_name(level)
         points_to_next_rank = get_points_to_next_rank(level, points)
-        client.send_message(chat_id, f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank.")
+        response_text = f"Your current rank in this group is {rank_name} ({points} points). {points_to_next_rank} points to next rank."
+        client.send_chat_action(chat_id, "typing")  # send a typing action
+        client.send_message(chat_id, f"`{message.from_user.first_name}` {response_text}", reply_to_message_id=message.message_id)
+
 
 
 
