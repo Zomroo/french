@@ -7,10 +7,10 @@ if __name__ == '__main__':
     try:
         alive.app.start()
         rank.app.start()
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except KeyboardInterrupt:
+        print('\nExiting...')
     finally:
-        if alive.app.is_running:
+        if alive.app.is_connected:
             alive.app.stop()
-        if rank.app.is_running:
+        if rank.app.is_connected:
             rank.app.stop()
