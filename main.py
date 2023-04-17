@@ -10,5 +10,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print('\nExiting...')
     finally:
-        alive.app.stop()
-        rank.app.stop()
+        if alive.app.is_running:
+            alive.app.stop()
+        if rank.app.is_running:
+            rank.app.stop()
