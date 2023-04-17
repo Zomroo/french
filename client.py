@@ -1,5 +1,5 @@
-import config
 from pyrogram import Client
+import config
 
 app = Client(
     session_name=config.SESSION_NAME,
