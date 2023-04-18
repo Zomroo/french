@@ -1,7 +1,7 @@
 import config 
- from pyrogram import Client, filters 
- from pyrogram.types import Message 
- from database.database import Database 
+from pyrogram import Client, filters 
+from pyrogram.types import Message 
+from database.database import Database 
   
  db = Database(config.MONGO_URI, config.MONGO_DB_NAME) 
  app = Client("my_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
