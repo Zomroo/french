@@ -41,54 +41,59 @@ def handle_message(client: Client, message: Message):
     # Update user's points in the database 
     db.update_user(chat_id, user_id, level, points) 
   
-# Define message handler for /rank command 
-@app.on_message(filters.command("rank") & filters.group) 
-def handle_rank_command(client: Client, message: Message): 
-    chat_id = message.chat.id 
-    user_id = None 
-    if len(message.command) < 2: 
-        # User ID not provided, get own rank and points 
-        user_id = message.from_user.id 
-    else: 
-        try: 
-            user_id = int(message.command[1]) 
-        except ValueError: 
-            client.send_message(chat_id, "Invalid user ID.") 
-            return 
-  
-    user_data = db.get_user(chat_id, user_id) 
-    if user_data is None: 
-        client.send_message(chat_id, "User not found in the database.") 
-        return 
-  
-    points = user_data.get("points", 0) 
-    level = user_data.get("level", 0) 
-    rank_name = get_rank_name(level) 
-  
-    message_text = f"The user with ID {user_id} has rank {rank_name} and {points} points in this chat." 
-    client.send_message(chat_id, message_text) 
-  
-# Define start command handler 
-@app.on_message(filters.command("start") & filters.private) 
-def start(client, message): 
-    text = "Hi there! I am your bot. Send me a message in a group chat to start earning points." 
-    client.send_message(chat_id=message.chat.id, text=text)
-         
-def get_level(points: int) -> int: 
-    for i, rank in enumerate(RANKS): 
-        if points < rank["points"]: 
-            return i 
-    return len(RANKS) 
-  
-def get_rank_name(level: int) -> str: 
-    return RANKS[level]["name"] 
-  
-def get_points_to_next_rank(level: int, points: int) -> int: 
-    next_rank_points = RANKS[level + 1]["points"] if level + 1 < len(RANKS) else None 
-    if next_rank_points is None: 
-        return 0 
-    else: 
-        return next_rank_points - points
+# Define message handler for /rank command
+@app.on_message(filters.command("rank") & filters.group)
+def handle_rank_command(client: Client, message: Message):
+    chat_id = message.chat.id
+    user_id = None
+    if len(message.command) < 2:
+        # User ID not provided, get own rank and points
+        user_id = message.from_user.id
+    else:
+        try:
+            user_id = int(message.command[1])
+        except ValueError:
+            client.send_message(chat_id, "Invalid user ID.")
+            return
 
-      
+    user_data = db.get_user(chat_id, user_id)
+    if user_data is None:
+        client.send_message(chat_id, "User not found in the database.")
+        return
+
+    points = user_data.get("points", 0)
+    level = user_data.get("level", 0)
+    rank_name = get_rank_name(level)
+
+    message_text = f"The user with ID {user_id} has rank {rank_name} and {points} points in this chat."
+    client.send_message(chat_id, message_text)
+
+
+# Define start command handler
+@app.on_message(filters.command("start") & filters.private)
+def start(client, message):
+    text = "Hi there! I am your bot. Send me a message in a group chat to start earning points."
+    client.send_message(chat_id=message.chat.id, text=text)
+
+
+def get_level(points: int) -> int:
+    for i, rank in enumerate(RANKS):
+        if points < rank["points"]:
+            return i
+    return len(RANKS)
+
+
+def get_rank_name(level: int) -> str:
+    return RANKS[level]["name"]
+
+
+def get_points_to_next_rank(level: int, points: int) -> int:
+    next_rank_points = RANKS[level + 1]["points"] if level + 1 < len(RANKS) else None
+    if next_rank_points is None:
+        return 0
+    else:
+        return next_rank_points - points
+
+
 app.run()
+
