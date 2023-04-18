@@ -83,7 +83,7 @@ def get_level(points: int) -> int:
 def get_rank_name(level: int) -> str: 
     return RANKS[level]["name"] 
   
-def get_points_to_next_rank(level: int, points: int) -> int: 
+def get_points_to_next_rank(level: int, points: int) -> int: 
     next_rank_points = RANKS[level + 1]["points"] if level + 1 < len(RANKS) else None 
     if next_rank_points is None: 
         return 0 
