@@ -42,7 +42,7 @@ def handle_message(client: Client, message: Message):
     db.update_user(chat_id, user_id, level, points) 
   
 # Define message handler for /rank command
-@app.on_message(filters.command("rank") & filters.group)
+@app.on_message(filters.group & filters.command("rank"))
 def handle_rank_command(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = None
