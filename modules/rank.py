@@ -45,34 +45,6 @@ def handle_message(client: Client, message: Message):
     db.update_user(chat_id, user_id, level, points)
 
 
-    
-# Define message handler for /rank command
-@app.on_message(filters.command("rank") & filters.group)
-def handle_rank_command(client: Client, message: Message):
-    chat_id = message.chat.id
-    user_id = None
-    if len(message.command) < 2:
-        # User ID not provided, get own rank and points
-        user_id = message.from_user.id
-    else:
-        try:
-            user_id = int(message.command[1])
-        except ValueError:
-            client.send_message(chat_id, "Invalid user ID.")
-            return
-
-    user_data = db.get_user(chat_id, user_id)
-    if user_data is None:
-        client.send_message(chat_id, "User not found in the database.")
-        return
-
-    points = user_data.get("points", 0)
-    level = user_data.get("level", 0)
-    rank_name = get_rank_name(level)
-
-    message_text = f"The user with ID {user_id} has rank {rank_name} and {points} points in this chat."
-    client.send_message(chat_id, message_text)
-
 
 # Define start command handler
 @app.on_message(filters.command("start") & filters.private)
@@ -80,6 +52,27 @@ def start(client, message):
     text = "Hi there! I am your bot. Send me a message in a group chat to start earning points."
     client.send_message(chat_id=message.chat.id, text=text)
         
+# Define rank command handler
+@app.on_message(filters.command("rank") & filters.group)
+def rank(client: Client, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    user_data = db.get_user(chat_id, user_id)
+
+    if user_data is None:
+        db.add_user(chat_id, user_id)
+        points = 0
+    else:
+        points = user_data.get("points", 0)
+
+    # Get user's rank information
+    level = user_data.get("level", 0)
+    rank_name = get_rank_name(level)
+    points_to_next_rank = get_points_to_next_rank(level, points)
+
+    # Send user's rank information as a reply
+    reply_text = f"{message.from_user.mention} your rank is {rank_name}, with {points} points. You need {points_to_next_rank} more points to reach the next rank."
+    client.send_message(chat_id, reply_text)
         
         
         
