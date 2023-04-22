@@ -18,12 +18,12 @@ RANKS = [
 # Define message handler 
 @app.on_message(filters.group) 
 def handle_message(client: Client, message: Message): 
-    chat_id = message.chat.id 
-    user_id = message.from_user.id 
-    user_data = db.get_user(chat_id, user_id) 
+    chat = message.chat
+    user = message.from_user
+    user_data = db.get_user(chat.id, user.id) 
   
     if user_data is None: 
-        db.add_user(chat_id, user_id) 
+        db.add_user(chat.id, user.id) 
         points = 0 
     else: 
         points = user_data.get("points", 0) 
@@ -34,39 +34,38 @@ def handle_message(client: Client, message: Message):
     # Check if user has enough points to be promoted to next rank 
     level = get_level(points) 
     if level > user_data.get("level", 0): 
-        db.update_user(chat_id, user_id, level, points) 
+        db.update_user(chat.id, user.id, level, points) 
         rank_name = get_rank_name(level) 
-        client.send_message(chat_id, f"Congratulations {message.from_user.mention}, you have been promoted to {rank_name}!") 
+        client.send_message(chat_id, f"Congratulations {user.mention}, you have been promoted to {rank_name}!") 
   
     # Update user's points in the database 
-    db.update_user(chat_id, user_id, level, points) 
+    db.update_user(chat.id, user.id, level, points) 
   
 # Define message handler for /rank command
-@app.on_message(filters.group & filters.command("rank"))
-def handle_rank_command(client: Client, message: Message):
-    chat_id = message.chat.id
-    user_id = None
+@app.on_message(filters.group & filters.command(["rank"], ["!", "/"]))
+def rank_command(client: Client, message: Message):
+    chat = message.chat
     if len(message.command) < 2:
         # User ID not provided, get own rank and points
-        user_id = message.from_user.id
+        user = message.from_user
     else:
         try:
-            user_id = int(message.command[1])
-        except ValueError:
-            client.send_message(chat_id, "Invalid user ID.")
+            user = client.get_users(message.command[1])
+        except Exception as eor:
+            message.reply(str(eor))
             return
 
-    user_data = db.get_user(chat_id, user_id)
+    user_data = db.get_user(chat.id, user.id)
     if user_data is None:
-        client.send_message(chat_id, "User not found in the database.")
+        client.send_message(chat.id, "User not found in the database.")
         return
 
     points = user_data.get("points", 0)
     level = user_data.get("level", 0)
     rank_name = get_rank_name(level)
 
-    message_text = f"The user with ID {user_id} has rank {rank_name} and {points} points in this chat."
-    client.send_message(chat_id, message_text)
+    message_text = f"The user with ID {user.mention} has rank {rank_name} and {points} points in this chat."
+    client.send_message(chat.id, message_text)
 
 
 # Define start command handler
